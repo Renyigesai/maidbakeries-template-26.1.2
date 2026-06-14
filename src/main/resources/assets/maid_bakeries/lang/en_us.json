@@ -1,0 +1,13 @@
+{
+  "itemGroup.maid_bakeries": "Example Mod Tab",
+  "block.maid_bakeries.example_block": "Example Block",
+  "item.maid_bakeries.example_item": "Example Item",
+
+  "maid_bakeries.configuration.title": "Maid Bakeries Configs",
+  "maid_bakeries.configuration.section.maid_bakeries.common.toml": "Maid Bakeries Configs",
+  "maid_bakeries.configuration.section.maid_bakeries.common.toml.title": "Maid Bakeries Configs",
+  "maid_bakeries.configuration.items": "Item List",
+  "maid_bakeries.configuration.logDirtBlock": "Log Dirt Block",
+  "maid_bakeries.configuration.magicNumberIntroduction": "Magic Number Text",
+  "maid_bakeries.configuration.magicNumber": "Magic Number"
+}

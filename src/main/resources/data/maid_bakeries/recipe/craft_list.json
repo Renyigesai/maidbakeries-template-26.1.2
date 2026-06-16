@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "aba",
+    "aca",
+    "ada"
+  ],
+  "key": {
+    "a": "minecraft:paper",
+    "b": "bakeries:round_bread",
+    "c": "minecraft:book",
+    "d": "minecraft:feather"
+  },
+  "result": {
+    "id": "maid_bakeries:craft_list",
+    "count": 1
+  }
+}

@@ -1,6 +1,8 @@
 package com.renyigesai.maid_bakeries.data;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
 public class IngredientData {
@@ -15,4 +17,13 @@ public class IngredientData {
         this.stack = stack;
         this.type = type;
     }
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, IngredientData> STREAM_CODEC =
+            StreamCodec.composite(
+                    ItemStack.STREAM_CODEC,
+                    d -> d.stack,
+                    ByteBufCodecs.STRING_UTF8,
+                    d -> d.type,
+                    IngredientData::new
+            );
 }

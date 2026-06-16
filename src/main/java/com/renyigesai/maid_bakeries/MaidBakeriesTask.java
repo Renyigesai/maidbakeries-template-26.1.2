@@ -3,7 +3,7 @@ package com.renyigesai.maid_bakeries;
 import com.github.tartaricacid.touhoulittlemaid.api.ILittleMaid;
 import com.github.tartaricacid.touhoulittlemaid.api.LittleMaidExtension;
 import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
-import com.renyigesai.maid_bakeries.task.*;
+import com.renyigesai.maid_bakeries.entity.task.*;
 
 @LittleMaidExtension
 public class MaidBakeriesTask implements ILittleMaid {

@@ -1,15 +1,13 @@
 package com.renyigesai.maid_bakeries;
 
+import com.renyigesai.bakeries.common.init.BakeriesRecipes;
 import com.renyigesai.maid_bakeries.init.*;
-import com.renyigesai.maid_bakeries.network.Messages;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import com.renyigesai.maid_bakeries.util.IORecipeAccessor;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.Identifier;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,24 +21,32 @@ public class MaidBakeries {
     public static final String MODID = "maid_bakeries";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-    public MaidBakeries() {
-        MinecraftForge.EVENT_BUS.register(this);
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        MaidBakeriesItems.REGISTER.register(bus);
-        MaidBakeriesGroup.REGISTER.register(bus);
-        MaidBakeriesMenuType.REGISTRY.register(bus);
-        bus.addListener(this::commonSetup);
-        MaidBakeriesPoiTypes.register(bus);
+    public MaidBakeries(IEventBus modEventBus) {
+        MaidBakeriesDataComponents.REGISTER.register(modEventBus);
+        MaidBakeriesItems.REGISTER.register(modEventBus);
+        MaidBakeriesGroup.REGISTER.register(modEventBus);
+        MaidBakeriesMenuType.REGISTRY.register(modEventBus);
+        modEventBus.addListener(this::commonSetup);
+        MaidBakeriesPoiTypes.register(modEventBus);
+    }
 
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    private static void registerMBRecipeAccessor(){
+        IORecipeAccessor.registerInput(BakeriesRecipes.BLENDER_TYPE.get(), recipe -> recipe.getInputItems());
+        IORecipeAccessor.registerOutput(BakeriesRecipes.BLENDER_TYPE.get(), recipe -> recipe.result().create());
+
+        IORecipeAccessor.registerInput(BakeriesRecipes.OVEN_TYPE.get(), recipe -> NonNullList.of(recipe.getInput()));
+        IORecipeAccessor.registerOutput(BakeriesRecipes.OVEN_TYPE.get(), recipe -> recipe.getResult().create());
+
+        IORecipeAccessor.registerInput(BakeriesRecipes.DOUGH_CRAFTING_TABLE_TYPE.get(), recipe -> NonNullList.of(recipe.input()));
+        IORecipeAccessor.registerOutput(BakeriesRecipes.DOUGH_CRAFTING_TABLE_TYPE.get(),  recipe -> recipe.result.create());
+
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        Messages.register();
+        registerMBRecipeAccessor();
     }
 
-    public static ResourceLocation prefix(String name) {
-        return new ResourceLocation(MODID, name.toLowerCase(Locale.ROOT));
+    public static Identifier prefix(String name) {
+        return Identifier.fromNamespaceAndPath(MODID, name.toLowerCase(Locale.ROOT));
     }
 }

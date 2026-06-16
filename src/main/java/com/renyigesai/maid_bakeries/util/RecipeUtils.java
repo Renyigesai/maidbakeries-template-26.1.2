@@ -1,17 +1,17 @@
 package com.renyigesai.maid_bakeries.util;
 
-import com.mojang.logging.LogUtils;
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RecipeUtils {
     /**
@@ -20,46 +20,61 @@ public class RecipeUtils {
      * @param recipeType 配方类型
      * @return 包含所有成品的集合
      */
-    public static List<ItemStack> getAllRecipeResults(Level level, RecipeType<?> recipeType) {
+    public static <I extends RecipeInput, T extends Recipe<I>> List<ItemStack> getAllRecipeResults(Level level, RecipeType<T> recipeType) {
         List<ItemStack> results = new ArrayList<>();
-        RecipeManager recipeManager = level.getRecipeManager();
-        Collection<Recipe<?>> recipes = recipeManager.getRecipes().stream()
-                .filter(recipe -> recipe.getType() == recipeType)
-                .toList();
-        for (Recipe<?> recipe : recipes) {
-            try {
-                ItemStack result = recipe.getResultItem(level.registryAccess());
-                if (!result.isEmpty()) {
-                    results.add(result);
-                }
-            } catch (Exception e) {
-                LogUtils.getLogger().warn("Failed to get result for recipe: {}", recipe.getId(), e);
-            }
+        if (level.recipeAccess() instanceof RecipeManager recipeManager) {
+            recipeManager.recipeMap().byType(recipeType).forEach(holder -> {
+                results.add(IORecipeAccessor.getOutput(holder.value()));
+            });
         }
         return results;
     }
 
-    public static boolean isResultItem(Level level, RecipeType<?> recipeType,ItemStack outResult){
-        List<ItemStack> allRecipeResults = getAllRecipeResults(level, recipeType);
-        for (ItemStack allRecipeResult : allRecipeResults) {
-            if (allRecipeResult.is(outResult.getItem())) {
-                return true;
+    public static boolean isResultItem(Level level, RecipeType<?> recipeType, ItemStack outResult) {
+        if (level.recipeAccess() instanceof RecipeManager manager) {
+            // 遍历所有配方，筛选出指定类型
+            for (RecipeHolder<?> holder : manager.getRecipes()) {
+                if (holder.value().getType() == recipeType) {
+                    ItemStack output = IORecipeAccessor.getOutput(holder.value());
+                    if (ItemStack.isSameItemSameComponents(output, outResult)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
     }
 
     public static List<Recipe<?>> getRecipesByOutput(ItemStack output, RecipeType<?> recipeType, Level level) {
-        if (level == null || level.isClientSide) {
+        if (level == null || level.isClientSide()) {
             return List.of();
         }
         List<Recipe<?>> matchedRecipes = new ArrayList<>();
-        RecipeManager recipeManager = level.getRecipeManager();
-        for (Recipe<?> recipe : recipeManager.getRecipes()) {
-            if (recipe.getType() == recipeType) {
-                ItemStack result = recipe.getResultItem(level.registryAccess());
-                if (result.is(output.getItem())) {
-                    matchedRecipes.add(recipe);
+        if (level.recipeAccess() instanceof RecipeManager recipeManager){
+            for (RecipeHolder<?> recipe : recipeManager.getRecipes()) {
+                if (recipe.value().getType() == recipeType) {
+                    ItemStack result = IORecipeAccessor.getOutput(recipe.value());
+                    if (result.is(output.getItem())) {
+                        matchedRecipes.add(recipe.value());
+                    }
+                }
+            }
+        }
+        return matchedRecipes;
+    }
+
+    public static List<RecipeHolder<?>> getRecipeHoldersByOutput(ItemStack output, RecipeType<?> recipeType, Level level) {
+        if (level == null || level.isClientSide()) {
+            return List.of();
+        }
+        List<RecipeHolder<?>> matchedRecipes = new ArrayList<>();
+        if (level.recipeAccess() instanceof RecipeManager recipeManager){
+            for (RecipeHolder<?> recipe : recipeManager.getRecipes()) {
+                if (recipe.value().getType() == recipeType) {
+                    ItemStack result = IORecipeAccessor.getOutput(recipe.value());
+                    if (result.is(output.getItem())) {
+                        matchedRecipes.add(recipe);
+                    }
                 }
             }
         }
@@ -72,7 +87,12 @@ public class RecipeUtils {
      */
     public static Recipe<?> getFirstRecipeByOutput(ItemStack output, RecipeType<?> recipeType, Level level) {
         List<Recipe<?>> recipes = getRecipesByOutput(output, recipeType, level);
-        return recipes.isEmpty() ? null : recipes.get(0);
+        return recipes.isEmpty() ? null : recipes.getFirst();
+    }
+
+    public static RecipeHolder<?> getFirstRecipeHolderByOutput(ItemStack output, RecipeType<?> recipeType, Level level) {
+        List<RecipeHolder<?>> recipes = getRecipeHoldersByOutput(output, recipeType, level);
+        return recipes.isEmpty() ? null : recipes.getFirst();
     }
 
     public static List<ItemStack> getIngredientsFromRecipe(Recipe<?> recipe, Level level) {
@@ -80,33 +100,26 @@ public class RecipeUtils {
             return List.of();
         }
         List<ItemStack> ingredients = new ArrayList<>();
-        for (Ingredient ing : recipe.getIngredients()) {
+        for (Ingredient ing : IORecipeAccessor.getInput(recipe)) {
             if (ing.isEmpty()) {
                 continue;
             }
-            ItemStack[] stacks = ing.getItems();
+            List<Holder<Item>> list = ing.getValues().stream().toList();
+            ItemStack[] stacks = new ItemStack[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                stacks[i] = new ItemStack(list.get(i));
+            }
             if (stacks.length > 0) {
-//                for (int i = 0; i < stacks.length; i++) {
-//                    System.out.println(stacks[i]);
-//                }
                 ingredients.add(stacks[0].copy());
             }
         }
         return ingredients;
     }
 
-    public static List<ItemStack> getIngredientsByOutput(ItemStack output, RecipeType<?> recipeType, Level level) {
-        if (level == null || level.isClientSide) {
-            return List.of(); // 客户端配方数据不完整
-        }
-        Recipe<?> recipe = getFirstRecipeByOutput(output, recipeType, level);
-        return getIngredientsFromRecipe(recipe, level);
-    }
-
     public static List<ItemStack> getBakeriesItem(){
         ArrayList<ItemStack> stacks = new ArrayList<>();
-        for (Item item : ForgeRegistries.ITEMS.getValues()) {
-            ResourceLocation registryName = ForgeRegistries.ITEMS.getKey(item);
+        for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
+            Identifier registryName =BuiltInRegistries.ITEM.getKey(item);
             if (registryName != null && registryName.getNamespace().equals("bakeries")) {
                 stacks.add(new ItemStack(item));
             }
@@ -114,16 +127,31 @@ public class RecipeUtils {
         return stacks;
     }
 
-    public static List<ItemStack> getMatchList(NonNullList<Ingredient> ingredients, IItemHandler itemHandler) {
-        List<ItemStack> stacks = new ArrayList<>();
+    public static List<ItemResource> getMatchList(NonNullList<Ingredient> ingredients, CombinedResourceHandler<ItemResource> itemHandler) {
+        List<ItemResource> stacks = new ArrayList<>();
         for (Ingredient ingredient : ingredients) {
-            if (ingredient == Ingredient.EMPTY) {
+            if (ingredient.test(ItemStack.EMPTY)) {
                 continue;
             }
-            for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
-                ItemStack maidItem = itemHandler.getStackInSlot(slot);
-                if (ingredient.test(maidItem)) {
+            for (int slot = 0; slot < itemHandler.size(); slot++) {
+                ItemResource maidItem = itemHandler.getResource(slot);
+                if (ingredient.test(maidItem.toStack())) {
                     stacks.add(maidItem);
+                    break;
+                }
+            }
+        }
+        return stacks;
+    }
+    public static List<Integer> getMatchListIndex(NonNullList<Ingredient> ingredients, CombinedResourceHandler<ItemResource> itemHandler) {
+        List<Integer> stacks = new ArrayList<>();
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.test(ItemStack.EMPTY)) {
+                continue;
+            }
+            for (int slot = 0; slot < itemHandler.size(); slot++) {
+                if (ingredient.test(itemHandler.getResource(slot).toStack())) {
+                    stacks.add(slot);
                     break;
                 }
             }

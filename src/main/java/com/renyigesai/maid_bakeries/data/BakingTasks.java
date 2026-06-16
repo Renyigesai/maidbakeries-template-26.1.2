@@ -15,4 +15,8 @@ public class BakingTasks {
         map.put(key,linkedList);
         System.out.println(map);
     }
+
+    public static void remove(UUID key) {
+        map.remove(key);
+    }
 }

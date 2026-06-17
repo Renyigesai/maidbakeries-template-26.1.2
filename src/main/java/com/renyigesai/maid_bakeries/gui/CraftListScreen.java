@@ -102,7 +102,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
             }
         }
 
-        placeLogo(graphics,this.typePage,x + 44,y + 43);
+        placeLogo(graphics,this.typePage,x + 43,y + 36);
         if (mouseX >= x + 111 && mouseX <= x + 121 && mouseY >= y + 75 && mouseY <= y + 85){
             graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 111,y + 75,11,170,11,11,256,256);
         }else {

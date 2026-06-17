@@ -58,13 +58,13 @@ public class CraftOrderScreen extends AbstractContainerScreen<CraftOrderMenu> {
                 guiGraphics.fakeItem(end,0,0);
                 guiGraphics.pose().popMatrix();
                 String key = end.getItem().getDescriptionId();
-//                int repeat = player.getMainHandItem().getOrDefault(MaidBakeriesDataComponents.INT.get(),0);
-                Component nameComponent = Component.translatable(key).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.ITALIC);
-//                if (repeat > 1){
-//                    nameComponent = Component.translatable(key).append("x").append(String.valueOf(repeat)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.ITALIC);
-//                }else {
-//                    nameComponent = Component.translatable(key).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.ITALIC);
-//                }
+                int repeat = end.count();
+                Component nameComponent;
+                if (repeat > 1){
+                    nameComponent = Component.translatable(key).append("x").append(String.valueOf(repeat)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.ITALIC);
+                }else {
+                    nameComponent = Component.translatable(key).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.ITALIC);
+                }
                 int textWidth = this.font.width(nameComponent);
                 guiGraphics.text(mc.font, nameComponent,centerX + 16 - textWidth / 2, centerY + 32,-12566464, false);
             }

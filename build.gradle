@@ -109,9 +109,12 @@ dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
     compileOnly 'com.github.TouhouLittleMaid:TouhouLittleMaid-26.1:master-SNAPSHOT'
     runtimeOnly 'com.github.TouhouLittleMaid:TouhouLittleMaid-26.1:master-SNAPSHOT'
+//    compileOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
+//    runtimeOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
+    implementation "curse.maven:bakeries-1191781:8147150"
 
-    compileOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
-    runtimeOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
+//    implementation 'com.github.renyigesai:bakeries:1.0.0'
+//    implementation 'com.github.renyigesai:bakeries:1.0.0'
 
     //com.github.Renyigesai:Bakeries-26.1.2:abc1234
 

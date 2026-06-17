@@ -7,6 +7,7 @@ import com.renyigesai.bakeries.common.blocks.oven.OvenBlock;
 import com.renyigesai.bakeries.common.blocks.oven.OvenBlockEntity;
 import com.renyigesai.bakeries.common.init.BakeriesBlocks;
 import com.renyigesai.bakeries.common.recipe.OvenRecipe;
+import com.renyigesai.maid_bakeries.MaidBakeries;
 import com.renyigesai.maid_bakeries.entity.task.AbstractCraftMaidTask;
 import com.renyigesai.maid_bakeries.entity.task.TaskResult;
 import com.renyigesai.maid_bakeries.init.MaidBakeriesTags;
@@ -69,7 +70,7 @@ public class MaidCraftOvenTask extends AbstractCraftMaidTask {
                 oven.setTemperature(perfectTemperature);
                 for (int i = 0; i < oven.getItemHandler().getSlots(); i++) {
                     ItemStack stackInSlot = oven.getItemHandler().getStackInSlot(i);
-                    Item item = ((OvenRecipe) recipe).getInput().getValues().get(0).value();
+                    Item item = IORecipeAccessor.getInput(recipe).get(0).getValues().get(0).value();
                     boolean b1 = stackInSlot.isEmpty();
                     boolean b2 = ItemsUtil.isStackIn(maidAvailableInv, stack -> stack.is(item));
                     if (b1 && b2){
@@ -127,6 +128,11 @@ public class MaidCraftOvenTask extends AbstractCraftMaidTask {
     public boolean canCollect(ServerLevel world, BlockPos hivePos) {
         BlockState state = world.getBlockState(hivePos);
         return state.is(BakeriesBlocks.OVEN.get()) && !state.getValue(OvenBlock.LIT);
+    }
+
+    @Override
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"oven");
     }
 
 }

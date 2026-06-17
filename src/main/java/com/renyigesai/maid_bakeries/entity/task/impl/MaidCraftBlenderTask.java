@@ -7,6 +7,7 @@ import com.renyigesai.bakeries.common.blocks.blander.BlenderBlockEntity;
 import com.renyigesai.bakeries.common.init.BakeriesBlocks;
 import com.renyigesai.bakeries.common.init.BakeriesRecipes;
 import com.renyigesai.bakeries.common.recipe.blender.BlenderRecipe;
+import com.renyigesai.maid_bakeries.MaidBakeries;
 import com.renyigesai.maid_bakeries.entity.task.AbstractCraftMaidTask;
 import com.renyigesai.maid_bakeries.entity.task.TaskResult;
 import com.renyigesai.maid_bakeries.init.MaidBakeriesTags;
@@ -14,6 +15,7 @@ import com.renyigesai.maid_bakeries.util.IORecipeAccessor;
 import com.renyigesai.maid_bakeries.util.RecipeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -88,6 +90,11 @@ public class MaidCraftBlenderTask extends AbstractCraftMaidTask {
     @Override
     public boolean notBlockEntity() {
         return false;
+    }
+
+    @Override
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"blender");
     }
 
     @Override

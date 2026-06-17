@@ -2,19 +2,24 @@ package com.renyigesai.maid_bakeries.entity.task.impl;
 
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
+import com.renyigesai.maid_bakeries.MaidBakeries;
 import com.renyigesai.maid_bakeries.entity.task.AbstractCraftMaidTask;
 import com.renyigesai.maid_bakeries.entity.task.TaskResult;
 import com.renyigesai.maid_bakeries.init.MaidBakeriesTags;
+import com.renyigesai.maid_bakeries.util.IORecipeAccessor;
 import com.renyigesai.maid_bakeries.util.RecipeUtils;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +49,7 @@ public class MaidCraftingTask extends AbstractCraftMaidTask {
     public void onCraft(ServerLevel level, EntityMaid maid, CombinedResourceHandler<ItemResource> maidAvailableInv) {
         Recipe<?> recipe = RecipeUtils.getFirstRecipeByOutput(matchingStack, RecipeType.CRAFTING, level);
         List<ItemStack> ingredients = List.of();
-        if (recipe != null){
+        if (recipe instanceof ShapelessRecipe){
             ingredients = RecipeUtils.getIngredientsFromRecipe(recipe, level);
         }
         if (!ingredients.isEmpty()){
@@ -58,8 +63,14 @@ public class MaidCraftingTask extends AbstractCraftMaidTask {
                     }
                 }
             }
-            stacks.forEach(stack -> stack.shrink(1));
-            ItemsUtil.insertItemStacked(maidAvailableInv, matchingStack.copy(), false,null);
+            ItemStack output = IORecipeAccessor.getOutput(recipe);
+            for (ItemStack stack : stacks) {
+                try (Transaction tx = Transaction.openRoot()) {
+                    maidAvailableInv.extract(ItemResource.of(stack), 1, tx);
+                    tx.commit();
+                }
+            }
+            ItemsUtil.insertItemStacked(maidAvailableInv, output.copy(), false,null);
         }
     }
 
@@ -67,5 +78,11 @@ public class MaidCraftingTask extends AbstractCraftMaidTask {
     public boolean notBlockEntity() {
         return true;
     }
+
+    @Override
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"crafting_shapeless");
+    }
+
 
 }

@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
 import com.renyigesai.bakeries.BakeriesMod;
 import com.renyigesai.bakeries.common.recipe.DoughCraftingTableRecipe;
+import com.renyigesai.maid_bakeries.MaidBakeries;
 import com.renyigesai.maid_bakeries.entity.task.AbstractCraftMaidTask;
 import com.renyigesai.maid_bakeries.entity.task.TaskResult;
 import com.renyigesai.maid_bakeries.init.MaidBakeriesTags;
@@ -68,10 +69,11 @@ public class MaidCraftDoughCraftingTableTask extends AbstractCraftMaidTask {
             level.playSound(null,maid.blockPosition(), SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundSource.BLOCKS);
             if (recipeOptional.isPresent()){
                 Recipe<?> recipe = recipeOptional.get().value();
-                Holder<Item> itemHolder = ((DoughCraftingTableRecipe) recipe).input().getValues().get(0);
+                Holder<Item> itemHolder = IORecipeAccessor.getInput(recipe).get(0).getValues().get(0);
                 ItemStack item = new ItemStack(itemHolder);
                 if (ItemsUtil.isStackIn(maidAvailableInv, stack -> stack.is(item.getItem()))){
-                    ItemStack output = IORecipeAccessor.getOutput(recipe);ItemStack result = ItemsUtil.insertItemStacked(maidAvailableInv, output, true,null);
+                    ItemStack output = IORecipeAccessor.getOutput(recipe);
+                    ItemStack result = ItemsUtil.insertItemStacked(maidAvailableInv, output, true,null);
                     if (!result.isEmpty()){
                         return;
                     }
@@ -84,5 +86,10 @@ public class MaidCraftDoughCraftingTableTask extends AbstractCraftMaidTask {
                 }
             }
         }
+    }
+
+    @Override
+    public Identifier getId() {
+        return Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"dough_crafting_table");
     }
 }

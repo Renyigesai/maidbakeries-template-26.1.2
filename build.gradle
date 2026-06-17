@@ -113,8 +113,6 @@ dependencies {
     compileOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
     runtimeOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
 
-    compileOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
-    runtimeOnly 'com.github.Renyigesai:Bakeries-26.1.2:master-SNAPSHOT'
     //com.github.Renyigesai:Bakeries-26.1.2:abc1234
 
     // Example optional mod dependency with JEI

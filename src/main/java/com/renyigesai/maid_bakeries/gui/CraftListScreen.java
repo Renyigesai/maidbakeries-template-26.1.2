@@ -31,6 +31,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
@@ -46,8 +47,9 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(MaidBakeries.MODID, "textures/gui/craft_list.png");
     private static final Identifier TEXTURE_ICON = Identifier.fromNamespaceAndPath(MaidBakeries.MODID, "textures/gui/icons.png");
     public int typePage = 0;
-    public static final List<Item> TYPE_ICONS = List.of(BakeriesItems.BLENDER.get(),BakeriesItems.DOUGH_CRAFTING_TABLE.get(),BakeriesItems.OVEN.get());;
-    public static final List<String> TYPES = List.of("blender","dough_crafting_table","oven");
+    public static final List<Item> TYPE_ICONS = List.of(BakeriesItems.BLENDER.get(),BakeriesItems.DOUGH_CRAFTING_TABLE.get(),BakeriesItems.OVEN.get(), Items.CRAFTING_TABLE);
+    public static final List<String> TYPES = List.of("blender","dough_crafting_table","oven","crafting_shapeless");
+    public int typeSize;
     private ItemStack selectStack;
     private int stackCount = 1;
     private EditBox editBox;
@@ -56,6 +58,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     public CraftListScreen(CraftListMenu p_97741_, Inventory p_97742_, Component p_97743_) {
         super(p_97741_, p_97742_, p_97743_);
         this.player = p_97742_.player;
+        typeSize = TYPES.size();
     }
 
     @Override
@@ -132,7 +135,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
         int x = (width - 135) / 2;
         int y = (height - 170) / 2;
         boolean flag = scrollY > 0;
-        int roller = flag ? 1 : -1;
+        int roller = flag ? -1 : 1;
         boolean isScrolled = addTypeScrolled(pMouseX,pMouseY,x,y,roller) || addSelectStackCountScrolled(pMouseX,pMouseY,x,y,roller);
         if (isScrolled){
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_HAT, 2.0F));
@@ -211,10 +214,10 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     private boolean addTypeScrolled(double pMouseX, double pMouseY,int x,int y,int roller){
         if (pMouseX >= x + 56 && pMouseX <= x + 78 && pMouseY >= y + 23 && pMouseY <= y + 44){
             int newTypePage = this.typePage + roller;
-            if (newTypePage >= 3){
+            if (newTypePage >= this.typeSize){
                 this.typePage = 0;
             }else if (newTypePage < 0){
-                this.typePage = 2;
+                this.typePage = this.typeSize - 1;
             } else {
                 this.typePage = newTypePage;
             }

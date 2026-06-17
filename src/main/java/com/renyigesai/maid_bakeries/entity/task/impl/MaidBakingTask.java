@@ -11,12 +11,15 @@ import com.renyigesai.maid_bakeries.entity.task.AbstractCraftMaidTask;
 import com.renyigesai.maid_bakeries.entity.task.TaskResult;
 import com.renyigesai.maid_bakeries.entity.task.MaidTaskLinkedList;
 import com.renyigesai.maid_bakeries.entity.task.MaidTaskNode;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.behavior.BlockPosTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
@@ -109,6 +112,17 @@ public class MaidBakingTask extends MaidCheckRateTask {
                     return; /*所有任务已完成或节点无效*/
                 }
 
+                if (maidTaskNode.task.waitForResponseTime >= 1200) {
+                    /*任务等待超时，清空链表，重置女仆状态，移除全局任务记录，切换会闲置状态并发送提示*/
+                    if (maid.getOwner() instanceof Player player){
+                        player.sendSystemMessage(Component.translatable("tooltip.maid_bakeries.maid_task_timeout",maid.getName().getString(),maidTaskNode.task.getId().toString()).withStyle(ChatFormatting.DARK_RED));
+                    }
+                    maidTaskLinkedList.hand.next = null;
+                    maid.setTask(new TaskIdle());
+                    BakingTasks.remove(maid.getUUID());
+                    return;
+                }
+
                 /*如果当前任务的目标已经满足（例如物品已足够），则直接标记为完成*/
                 if (maidTaskNode.task.successFlag(level, maid)) {
                     maidTaskLinkedList.completeCurrentNode(); // 将当前节点标记为已通过
@@ -125,6 +139,19 @@ public class MaidBakingTask extends MaidCheckRateTask {
                     if (maidTaskNode.task.notBlockEntity()) {
                         maidTaskNode.task.onCraft(level, maid, maidAvailableInv);
                         setNextCheckTickCount(5);
+                        if (maidTaskNode.task.end){
+                            if (!maidTaskNode.task.successFlag(level, maid)) {
+                                /*任务尚未达成目标，延长检查间隔，等待下一次尝试*/
+                                maidTaskNode.task.waitForResponseTime += 100;
+                                setNextCheckTickCount(100);
+                            } else {
+                                /*任务成功完成，清空链表，重置女仆状态，移除全局任务记录*/
+                                maidTaskLinkedList.hand.next = null;
+                                /*切换回闲置状态*/
+                                maid.setTask(new TaskIdle());
+                                BakingTasks.remove(maid.getUUID());
+                            }
+                        }
                         return;
                     }
 
@@ -149,6 +176,7 @@ public class MaidBakingTask extends MaidCheckRateTask {
                     if (maidTaskNode.task.end) {
                         if (!maidTaskNode.task.successFlag(level, maid)) {
                             /*任务尚未达成目标，延长检查间隔，等待下一次尝试*/
+                            maidTaskNode.task.waitForResponseTime += 100;
                             setNextCheckTickCount(100);
                         } else {
                             /*任务成功完成，清空链表，重置女仆状态，移除全局任务记录*/

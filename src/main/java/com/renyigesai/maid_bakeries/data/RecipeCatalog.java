@@ -31,8 +31,8 @@ public class RecipeCatalog {
     public static final Map<String, Supplier<AbstractCraftMaidTask>> TASKS;
 
     static {
-        RECIPE_TYPES = Map.of("oven",BakeriesRecipes.OVEN_TYPE.get(), "dough_crafting_table",BakeriesRecipes.DOUGH_CRAFTING_TABLE_TYPE.get(), "blender",BakeriesRecipes.BLENDER_TYPE.get());
-        TASKS = Map.of("oven",MaidCraftOvenTask::new,"dough_crafting_table",MaidCraftDoughCraftingTableTask::new,"blender",MaidCraftBlenderTask::new);
+        RECIPE_TYPES = Map.of("oven",BakeriesRecipes.OVEN_TYPE.get(), "dough_crafting_table",BakeriesRecipes.DOUGH_CRAFTING_TABLE_TYPE.get(), "blender",BakeriesRecipes.BLENDER_TYPE.get(),"crafting_shapeless",RecipeType.CRAFTING);
+        TASKS = Map.of("oven",MaidCraftOvenTask::new,"dough_crafting_table",MaidCraftDoughCraftingTableTask::new,"blender",MaidCraftBlenderTask::new,"crafting_shapeless",MaidCraftingTask::new);
     }
 
 }

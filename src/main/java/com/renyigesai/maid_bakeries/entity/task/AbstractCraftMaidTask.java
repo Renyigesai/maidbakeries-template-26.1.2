@@ -6,6 +6,7 @@ import com.github.tartaricacid.touhoulittlemaid.init.InitBrains;
 import com.github.tartaricacid.touhoulittlemaid.util.ItemsUtil;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -25,6 +26,7 @@ public abstract class AbstractCraftMaidTask extends MaidCheckRateTask{
     public String cacheRecipeId;
     public int targetCount = 1;
     public boolean end;
+    public int waitForResponseTime;
 
     public AbstractCraftMaidTask() {
         super(ImmutableMap.of(MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT,
@@ -50,8 +52,8 @@ public abstract class AbstractCraftMaidTask extends MaidCheckRateTask{
         CombinedResourceHandler<ItemResource> maidAvailableInv = maid.getAvailableInv(true);
         if (ItemsUtil.isStackIn(maidAvailableInv, stack -> stack.is(matchingStack.getItem()))){
             ItemStack maidStack = ItemsUtil.getStack(maid, stack -> stack.is(matchingStack.getItem()));
-//            int x = end ? targetCount : 1;
-//            return maidStack.getCount() >= matchingStack.getCount() * x;
+/*            int x = end ? targetCount : 1;
+            return maidStack.getCount() >= matchingStack.getCount() * x;*/
             return maidStack.getCount() >= targetCount;
         }
         return false;
@@ -71,4 +73,6 @@ public abstract class AbstractCraftMaidTask extends MaidCheckRateTask{
     public abstract void onCraft(ServerLevel level, EntityMaid maid,CombinedResourceHandler<ItemResource> maidAvailableInv);
 
     public abstract boolean notBlockEntity();
+
+    public abstract Identifier getId();
 }

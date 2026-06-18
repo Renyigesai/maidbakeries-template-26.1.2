@@ -53,8 +53,8 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     private ItemStack selectStack;
     private int stackCount = 1;
     private EditBox editBox;
-    private static final int[] XOS = new int[]{14,32,14,32,14,32};
-    private static final int[] YOS = new int[]{95,95,113,113,131,131};
+    private static final int[] XOS = new int[]{15,34,15,34,15,34};
+    private static final int[] YOS = new int[]{95,95,114,114,133,133};
     public CraftListScreen(CraftListMenu p_97741_, Inventory p_97742_, Component p_97743_) {
         super(p_97741_, p_97742_, p_97743_);
         this.player = p_97742_.player;
@@ -94,7 +94,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
                 Optional<Holder.Reference<Item>> itemReference = BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, parse));
                 if (itemReference.isPresent()){
                     this.selectStack = new ItemStack(itemReference.get().value(),this.stackCount);
-                    graphics.fakeItem(this.selectStack,x + 93,y + 71);
+                    graphics.fakeItem(this.selectStack,x + 94,y + 73);
                 }
             }catch (IdentifierException e){
                 this.editBox.setValue("");
@@ -103,16 +103,16 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
         }
 
         placeLogo(graphics,this.typePage,x + 43,y + 36);
-        if (mouseX >= x + 111 && mouseX <= x + 121 && mouseY >= y + 75 && mouseY <= y + 85){
-            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 111,y + 75,11,170,11,11,256,256);
+        if (mouseX >= x + 113 && mouseX <= x + 121 && mouseY >= y + 75 && mouseY <= y + 85){
+            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 113,y + 75,11,170,11,11,256,256);
         }else {
-            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 111,y + 75,0,170,11,11,256,256);
+            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 113,y + 75,0,170,11,11,256,256);
         }
 
-        if (mouseX >= x + 109 && mouseX <= x + 121 && mouseY >= y + 115 && mouseY <= y + 127){
-            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 109 + 3,y + 115 + 3,38,170,16,16,256,256);
+        if (mouseX >= x + 109 && mouseX <= x + 121 && mouseY >= y + 113 && mouseY <= y + 125){
+            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 109 + 3,y + 113 + 3,38,170,16,16,256,256);
         }else {
-            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 109 + 3,y + 115 + 3,22,170,16,16,256,256);
+            graphics.blit(RenderPipelines.GUI_TEXTURED,TEXTURE,x + 109 + 3,y + 113 + 3,22,170,16,16,256,256);
         }
 
         ItemStack mainHandItem = player.getMainHandItem();
@@ -227,7 +227,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     }
 
     private boolean addSelectStackCountScrolled(double pMouseX, double pMouseY,int x,int y,int roller){
-        if (this.selectStack != null && !this.selectStack.isEmpty() && pMouseX >= x + 94 && pMouseX <= x + 107 && pMouseY >= y + 74 && pMouseY <= y + 86) {
+        if (this.selectStack != null && !this.selectStack.isEmpty() && pMouseX >= x + 93 && pMouseX <= x + 110 && pMouseY >= y + 72 && pMouseY <= y + 89) {
             int count = this.selectStack.getCount();
             int newCount = count + roller;
             if (newCount > 64) {
@@ -244,7 +244,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     }
 
     private boolean addSelectStackClicked(double mouseX, double mouseY, int x, int y){
-        if (mouseX >= x + 111 && mouseX <= x + 121 && mouseY >= y + 75 && mouseY <= y + 85){
+        if (mouseX >= x + 113 && mouseX <= x + 121 && mouseY >= y + 75 && mouseY <= y + 85){
             if (this.selectStack != null && !this.selectStack.isEmpty()){
                 ItemStack listItem = player.getMainHandItem();
                 String ids = TYPES.get(this.typePage);
@@ -276,7 +276,7 @@ public class CraftListScreen extends AbstractContainerScreen<CraftListMenu> {
     }
 
     private boolean addCheckoutClicked(double mouseX, double mouseY, int x, int y){
-        if (mouseX >= x + 109 && mouseX <= x + 121 && mouseY >= y + 115 && mouseY <= y + 127){
+        if (mouseX >= x + 109 && mouseX <= x + 121 && mouseY >= y + 113 && mouseY <= y + 125){
             ItemStack listItem = player.getItemInHand(InteractionHand.MAIN_HAND);
             if (listItem.is(MaidBakeriesItems.CRAFT_LIST)){
                 List<ItemStack> stacks = new ArrayList<>();

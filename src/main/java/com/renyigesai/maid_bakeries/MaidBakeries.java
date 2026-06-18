@@ -66,7 +66,6 @@ public class MaidBakeries {
             }
             return NonNullList.create();
         });
-
         IORecipeAccessor.registerOutput(RecipeType.CRAFTING, recipe -> {
             if (recipe instanceof ShapelessRecipe shapelessRecipe){
                 if (shapelessRecipe.result() != null) {

@@ -144,7 +144,7 @@ public class CraftOrderScreen extends AbstractContainerScreen<CraftOrderMenu> {
                 "blender",Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"textures/gui/blender_icon.png"),
                 "dough_crafting_table",Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"textures/gui/dough_crafting_table_icon.png"),
                 "oven",Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"textures/gui/oven_icon.png"),
-                "crafting",Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"textures/gui/crafting_icon.png"));
+                "crafting_shapeless",Identifier.fromNamespaceAndPath(MaidBakeries.MODID,"textures/gui/crafting_icon.png"));
     }
 
 }
